@@ -385,7 +385,7 @@ static uint32_t ble_on_passkey_requested(mac_addr_t mac)
 
     return passkey;
 }
-
+#if 0
 void app_main()
 {
     /* Initialize NVS */
@@ -433,3 +433,4 @@ void app_main()
     wifi_hostname_set(device_name_get());
     wifi_connect(config_wifi_ssid_get(), config_wifi_password_get());
 }
+#endif

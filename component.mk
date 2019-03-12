@@ -10,9 +10,12 @@ GATT_H := $(COMPONENT_PATH)/gatt.h
 
 COMPONENT_EXTRA_CLEAN := $(GATT_INC) $(GATT_H)
 
+EXTRA_COMPONENT_DIRS += $(COMPONENT_PATH)/components/esp_request
+EXTRA_COMPONENT_DIRS += $(COMPONENT_PATH)/components/espmqtt
+
 ble_utils.o: $(GATT_H)
 gatt.o: $(GATT_INC)
 
-$(GATT_INC) $(GATT_H): $(PROJECT_PATH)/get_gatt_assigned_numbers.py
-	$(CONFIG_PYTHON) $(PROJECT_PATH)/get_gatt_assigned_numbers.py \
+$(GATT_INC) $(GATT_H): $(COMPONENT_PATH)/get_gatt_assigned_numbers.py
+	$(CONFIG_PYTHON) $(COMPONENT_PATH)/get_gatt_assigned_numbers.py \
 	  -H $(GATT_H) -C $(GATT_INC)

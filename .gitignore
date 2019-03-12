@@ -1,7 +1,7 @@
 # Outputs
 build/
-main/gatt.inc
-main/gatt.h
+gatt.inc
+gatt.h
 
 # Local files
 sdkconfig
