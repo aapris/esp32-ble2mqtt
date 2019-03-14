@@ -462,12 +462,74 @@ static broadcaster_ops_t beewi_smart_door_ops = {
     .metadata_get = beewi_smart_door_metadata_get,
 };
 
+/* RuuviTag
+ * Note that the RuuviTag sensor maybe also connectable. When connected, it
+ * provides battery information and door status history (without the current
+ * state). To overcome this, the sensor should be blacklisted so the app would
+ * not connect to it and the sensor would brodcast the current state. */
+#define RUUVI_INNNOVATIONS_COMPANY_ID 0x0499
+
+typedef struct {
+    uint16_t company_id;
+    uint8_t  payload[24];
+    uint8_t payload_len;
+} __attribute__((packed)) ruuvitag_t;
+
+static ruuvitag_t *ruuvitag_data_get(uint8_t *adv_data,
+    uint8_t adv_data_len, uint8_t *ruuvitag_len)
+{
+    uint8_t len;
+    uint8_t *data = esp_ble_resolve_adv_data(adv_data,
+        ESP_BLE_AD_MANUFACTURER_SPECIFIC_TYPE, &len);
+
+    if (ruuvitag_len)
+    {
+        *ruuvitag_len = len;
+    }
+
+    return (ruuvitag_t *)data;
+}
+
+static int ruuvitag_is_broadcaster(uint8_t *adv_data,
+    size_t adv_data_len)
+{
+    uint8_t len;
+
+    ruuvitag_t* ruuvitag = ruuvitag_data_get(adv_data,
+        adv_data_len, &len);
+    ruuvitag->payload_len = len;
+
+    if (!ruuvitag || RUUVI_INNNOVATIONS_COMPANY_ID != ruuvitag->company_id)
+    {
+        if(ruuvitag)
+        {
+            ESP_LOGD(TAG, "%X", ruuvitag->company_id);
+        }
+        return 0;
+    }
+
+    return 1;
+}
+
+static void ruuvitag_metadata_get(uint8_t *adv_data,
+    size_t adv_data_len, int rssi, broadcaster_meta_data_cb_t cb, void *ctx)
+{
+  // No implementation here, handled by application
+}
+
+static broadcaster_ops_t ruuvitag_ops = {
+    .name = "RuuviTag",
+    .is_broadcaster = ruuvitag_is_broadcaster,
+    .metadata_get = ruuvitag_metadata_get,
+};
+
 /* Common */
 static broadcaster_ops_t *broadcaster_ops[] = {
     &ibeacon_ops,
     &eddystone_ops,
     &mijia_temp_hum_ops,
     &beewi_smart_door_ops,
+    &ruuvitag_ops,
     NULL
 };
 
