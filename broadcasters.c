@@ -497,7 +497,6 @@ static int ruuvitag_is_broadcaster(uint8_t *adv_data,
 
     ruuvitag_t* ruuvitag = ruuvitag_data_get(adv_data,
         adv_data_len, &len);
-    ruuvitag->payload_len = len;
 
     if (!ruuvitag || RUUVI_INNNOVATIONS_COMPANY_ID != ruuvitag->company_id)
     {
@@ -507,7 +506,7 @@ static int ruuvitag_is_broadcaster(uint8_t *adv_data,
         }
         return 0;
     }
-
+    ruuvitag->payload_len = len;
     return 1;
 }
 
